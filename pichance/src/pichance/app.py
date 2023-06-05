@@ -75,7 +75,3 @@ class PicHance(toga.App):
 
 def main():
     return PicHance()
-
-
-if __name__ == '__main__':
-    main().main_loop()
