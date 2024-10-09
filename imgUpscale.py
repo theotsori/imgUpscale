@@ -1,40 +1,47 @@
 #!/usr/bin/python3
 
 import cv2
+import sys
 
 def upsample_image(image, scale):
     """Upsamples an image by the given scale factor.
 
     Args:
-        image: The image to upsample.
-        scale: The scale factor to upsample by.
+        image: The image to upsample (numpy array).
+        scale: The scale factor to upsample by (float, > 1).
 
     Returns:
-        The upsampled image.
+        The upsampled image (numpy array).
+
+    Raises:
+        ValueError: If the scale is not greater than 1.
     """
+    if scale <= 1:
+        raise ValueError("Scale factor must be greater than 1.")
 
-    # Get the dimensions of the image.
     height, width = image.shape[:2]
-
-    # Calculate the new dimensions based on the scale factor.
     new_height = int(height * scale)
     new_width = int(width * scale)
-
-    # Upsample the image using the Lanczos interpolation algorithm.
     upsampled_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_LANCZOS4)
-
-    # Return the upsampled image.
     return upsampled_image
 
 def main():
-    # Read the image from disk.
-    image = cv2.imread("2019me.jpg")
- 
-    # Upsample the image to 4K.
-    upsampled_image = upsample_image(image, 4)
+    if len(sys.argv) != 3:
+        print("Usage: python3 upsample.py <input_image> <output_image>")
+        sys.exit(1)
 
-    # Save the upsampled image to disk.
-    cv2.imwrite("upsampled2019.jpg", upsampled_image)
+    input_image_path = sys.argv[1]
+    output_image_path = sys.argv[2]
+
+    image = cv2.imread(input_image_path)
+    if image is None:
+        print(f"Error: Could not read the image '{input_image_path}'. Check the file path.")
+        sys.exit(1)
+
+    scale = 4  # You can make this dynamic if desired
+    upsampled_image = upsample_image(image, scale)
+    cv2.imwrite(output_image_path, upsampled_image)
+    print(f"Upsampled image saved as '{output_image_path}'.")
 
 if __name__ == "__main__":
     main()
